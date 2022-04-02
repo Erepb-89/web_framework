@@ -1,5 +1,7 @@
 import quopri
 
+from internet_shop_framework.requests import GetRequests, PostRequests
+
 
 class PageNotFound404:
     def __call__(self, request):
@@ -7,7 +9,6 @@ class PageNotFound404:
 
 
 class ISFramework:
-
     """Класс ISFramework - основа фреймворка"""
 
     def __init__(self, routes_obj, fronts_obj):
@@ -22,17 +23,31 @@ class ISFramework:
         if not url.endswith('/'):
             url = f'{url}/'
 
+        request = {}
+        # Получаем все данные запроса
+        method = environ['REQUEST_METHOD']
+        request['method'] = method
+
+        if method == 'POST':
+            data = PostRequests().get_request_params(environ)
+            request['data'] = data
+            print(f'Нам пришёл post-запрос: {ISFramework.decode_value(data)}')
+        if method == 'GET':
+            request_params = GetRequests().get_request_params(environ)
+            request['request_params'] = request_params
+            print(f'Нам пришли GET-параметры: {request_params}')
+        print(request)  # {'method': 'GET', 'request_params': {'id': '1', 'category': '10'}}
+
         # находим нужный контроллер
         # отработка паттерна page controller
         if url in self.urls_lst:
             view = self.urls_lst[url]
         else:
             view = PageNotFound404()
-        request = {}
         # наполняем словарь request элементами
         # этот словарь получат все контроллеры
         # отработка паттерна front controller
-        for front in self.fronts_lst:                   # можно сделать активного юзера, передавать между страницами
+        for front in self.fronts_lst:  # можно сделать активного юзера, передавать между страницами
             front(request)
         # запуск контроллера с передачей объекта request
         code, body = view(request)

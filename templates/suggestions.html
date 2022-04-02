@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        {{style}}
+    </style>
+    <meta charset="utf-8">
+    <title>Контакты</title>
+    <!--	<link rel="stylesheet" type="text/css" href="style.css">-->
+    <!--	<link rel="stylesheet" href="fonts/font-awesome/css/font-awesome.css">-->
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <div class="header clearfix">
+            <a href="index.html" class="logo"></a>
+            <ul class="menu">
+                <li><a href="../">домой</a></li>
+                <li><a href="../products/">продукты</a></li>
+                <li><a href="../contacts/">контакты</a></li>
+                <li><a href="../suggestions/" class="active">пожелания</a></li>
+            </ul>
+            <!--				<a href="#" class="search"></a>-->
+            <!--                <a href="#" class="basket"></a>-->
+        </div>
+        <h1>введите свои пожелания</h1>
+    </div>
+
+    <form action="" method="post" class="location">
+        <div class="text-footer location h4">
+            <input type="text" name="name" placeholder="Ваше Имя">
+            <input type="email" name="email" placeholder="Ваш email">
+            <br><br>
+            <span class="title">Ваш город:</span>
+            <br>
+            <select class="loc">
+                <option value="msk">Москва</option>
+                <option value="spb">Санкт-Петербург</option>
+                <option value="ebr">Екатеринбург</option>
+                <option value="kzn">Казань</option>
+                <option value="smr">Самара</option>
+                <option value="nsb">Новосибирск</option>
+            </select></p>
+            <span class="title">Являетесь участником?</span>
+            <label><input type="radio" name="member" value="yes"/> Да</label>
+            <label><input type="radio" name="member" value="no"/> Нет</label></p>
+        </div>
+        <div class="text-footer location h4">
+            <input class="loc" name="suggestion" placeholder="Введите пожелание">
+            <input type="submit" class="button-order" value="Оставить отзыв"/>
+        </div>
+    </form>
+
+    <div class="clr"></div>
+</div>
+
+<div class="footer">
+    <div class="clearfix">
+        <div class="text-footer">
+            <h3>контакты</h3>
+        </div>
+        <div class="text-footer">
+            <h3>полезная информация</h3>
+        </div>
+        <div class="text-footer clearfix">
+            <h3>Оставайтесь на связи</h3>
+            <p>Подписаться на новости и рассылки</p>
+                <form action="" method="post">
+                    <input type="email" name="email" placeholder="ваш email">
+                    <a href="#"><i class="fa fa-paper-plane fa-2x" aria-hidden="true"></i></a>
+                    <input type="submit" class="button-order" value="Подписаться"/>
+                </form>
+        </div>
+    </div>
+    <p class="small">&copy; GB {{data}}</p>
+    <!--        <div class="social">-->
+    <!--            <a href="#" class="social1"></a>-->
+    <!--            <a href="#" class="social2"></a>-->
+    <!--            <a href="#" class="social3"></a>-->
+    <!--            <a href="#" class="social4"></a>-->
+    <!--        </div>-->
+    <p class="small">Положения &amp; Условия / Конфиденциальность &amp; Cookies</p>
+</div>
+
+</body>
+</html>

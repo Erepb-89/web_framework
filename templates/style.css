@@ -12,6 +12,10 @@ html, body {
 	height: 100%;
 }
 
+.loc {
+	font-family: 'Montserrat', sans-serif;
+}
+
 .clr {
 	height: 384px;
 }
@@ -24,14 +28,14 @@ html, body {
 
 .slider {
 	height: 800px;
-	background-image: url(img/slider.jpg); 
+	/*background-image: url(img/slider.jpg); */
 	padding-left: 98px;
 	padding-right: 211px;
 	position: relative;
 }
 
 .logo {
-	background-image: url(img/logo.png);
+	/*background-image: url(img/logo.png);*/
 	margin-top: 63px;
 	width: 185px;
 	height: 22px;
@@ -624,7 +628,7 @@ td:first-child {
 	border-color:  #d9dee1;
 	border-style: solid;
 	background-color:  #ffffff;
-	width: 250px;
+	/*width: 250px;*/
 	height: 46px;
 	outline: none;
 	color:  #6c6c6c;

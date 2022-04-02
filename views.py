@@ -25,6 +25,14 @@ class Products:
             style=request.get('style', None))
 
 
+class Suggestions:
+    def __call__(self, request):
+        return '200 OK', render(
+            'suggestions.html',
+            data=request.get('data', None),
+            style=request.get('style', None))
+
+
 class NotFound404:
     def __call__(self, request):
         return '404 WHAT', '404 PAGE Not Found'
