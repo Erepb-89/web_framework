@@ -14,13 +14,6 @@ def style(request):
         request['style'] = css_file
 
 
-# def fonts(request):
-#     """fonts"""
-#     with open('templates/fonts/font-awesome/css/font-awesome.css') as file:
-#         font_file = file.read()
-#         request['fonts'] = font_file
-
-
 fronts = [date_front, style]
 
 routes = {
