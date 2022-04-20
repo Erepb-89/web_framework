@@ -1,0 +1,17 @@
+<div class="container">
+    <div>
+		<a href="/create-category/">Создать новую категорию</a>
+	</div>
+
+    {% for item in objects_list %}
+    <div class="location-1">
+        <div class="text">
+            <img src="../img/icon-hover.png" alt="">
+            <p>{{item.id}}. {{item.name}}</p>
+            <span>Количество продуктов: {{item.products_count()}}</span>
+            <br>
+            <a href="/products-list/?id={{item.id}}">Показать продукты</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>

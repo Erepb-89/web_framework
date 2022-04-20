@@ -1,10 +1,12 @@
 from datetime import date
-from views import Index, Contacts, Products, Suggestions
+from views import Index, Contacts, Products, ProductsList, \
+    Suggestions, Categories, CreateProduct, CopyProduct, \
+    CreateCategory
 
 
 # front controller
 def date_front(request):
-    request['data'] = date.today()
+    request['today'] = date.today()
 
 
 def style(request):
@@ -20,5 +22,10 @@ routes = {
     '/': Index(),
     '/contacts/': Contacts(),
     '/products/': Products(),
+    '/products-list/': ProductsList(),
+    '/categories/': Categories(),
     '/suggestions/': Suggestions(),
+    '/create-product/': CreateProduct(),
+    '/create-category/': CreateCategory(),
+    '/copy-product/': CopyProduct()
 }

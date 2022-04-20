@@ -1,0 +1,19 @@
+<div class="container">
+    <br>
+    <a href="/create-product/?id={{id}}">Создать новый продукт</a>
+    <br>
+    <br>
+    <h1>Список продуктов для категории "{{name}}"</h1>
+    {% for product in objects_list %}
+    <div class="location-1">
+        <div class="text">
+            <img src="../img/icon-hover.png" alt="">
+            <h4>{{product.name}}</h4>
+            <p>{{product.price}}</p>
+        </div>
+<!--        <span><a href="/copy-product/?name={{product.name}}">Скопировать</a></span>-->
+        <!--            <span><a href="/delete-product/?name={{product.name}}">Удалить</a></span>-->
+    </div>
+
+    {% endfor %}
+</div>

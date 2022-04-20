@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}
+    Создать продукт
+{% endblock %}
+
+{% block menu %}
+    {% include "particles/_create_product_menu.html" %}
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <br>
+        <p>Создание продукта для категории "{{name}}"</p>
+        <form method="post">
+            <div class="text-footer location h4">
+                <input class="loc" name="name" placeholder="Название продукта">
+                <input class="loc" name="price" placeholder="Цена">
+                <input type="submit" class="button-order" value="Сохранить"/>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {% include "particles/_footer.html" %}
+{% endblock %}
