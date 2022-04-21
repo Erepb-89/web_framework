@@ -32,14 +32,9 @@ class PostRequests(GetMethods):
     def get_wsgi_input_data(env) -> bytes:
         # получаем длину тела
         content_length_data = env.get('CONTENT_LENGTH')
-        print(f'длина - {type(content_length_data)}')  # длина - <class 'str'>
         # приводим к int
         content_length = int(content_length_data) if content_length_data else 0
-        print(content_length)
         # считываем данные, если они есть
-        # print(f"-{type(env['wsgi.input'])}") -> <class '_io.BufferedReader'>
-        # запускаем режим чтения
-        # Посмотрите в консоли браузера что грузится дольше всего - найдете причину!
         data = env['wsgi.input'].read(content_length) if content_length > 0 else b''
         return data
 
@@ -48,7 +43,6 @@ class PostRequests(GetMethods):
         if data:
             # декодируем данные
             data_str = data.decode(encoding='utf-8')
-            print(f'строка после декодирования - {data_str}')
             # собираем их в словарь
             result = self.parse_input_data(data_str)
         return result

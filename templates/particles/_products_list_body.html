@@ -1,5 +1,8 @@
 <div class="container">
     <br>
+    <a href="/categories/">Вернуться к категориям</a>
+    <br>
+    <br>
     <a href="/create-product/?id={{id}}">Создать новый продукт</a>
     <br>
     <br>
@@ -11,8 +14,8 @@
             <h4>{{product.name}}</h4>
             <p>{{product.price}}</p>
         </div>
-<!--        <span><a href="/copy-product/?name={{product.name}}">Скопировать</a></span>-->
-        <!--            <span><a href="/delete-product/?name={{product.name}}">Удалить</a></span>-->
+        <span><a href="/copy-product/?name={{product.name}}">Скопировать</a></span>
+        <span><a href="/delete-product/?name={{product.name}}">Удалить</a></span>
     </div>
 
     {% endfor %}

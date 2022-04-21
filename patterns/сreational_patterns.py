@@ -124,6 +124,13 @@ class Engine:
                 return item
         raise Exception(f'Нет категории с id = {id}')
 
+    def find_type_by_category_id(self, id):
+        for item in self.categories:
+            # print(item.name, item.id)
+            if item.id == id:
+                return item
+        raise Exception(f'Нет категории с id = {id}')
+
     @staticmethod
     def create_product(type_, name, category, price):
         return ProductFactory.create(type_, name, category, price)

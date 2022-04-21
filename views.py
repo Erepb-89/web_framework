@@ -1,5 +1,7 @@
 from internet_shop_framework.templator import render
 from patterns.сreational_patterns import Engine, Logger
+from patterns.structural_patterns import AppRoute, Debug
+from datetime import datetime
 
 site = Engine()
 site.admins = ['Erepb', 'Nik']
@@ -35,8 +37,12 @@ site.products.append(product9)
 
 logger = Logger('main')
 
+routes = {}
 
+
+@AppRoute(routes=routes, url='/')
 class Index:
+    @Debug(name='Index')
     def __call__(self, request):
         return '200 OK', render(
             'index.html',
@@ -44,7 +50,9 @@ class Index:
             style=request.get('style', None))
 
 
+@AppRoute(routes=routes, url='/contact/')
 class Contacts:
+    @Debug(name='Contacts')
     def __call__(self, request):
         return '200 OK', render(
             'contact.html',
@@ -53,7 +61,9 @@ class Contacts:
 
 
 # контроллер - список продуктов
+@AppRoute(routes=routes, url='/products/')
 class Products:
+    @Debug(name='Products')
     def __call__(self, request):
         print(request['request_params'])
         return '200 OK', render(
@@ -63,9 +73,11 @@ class Products:
 
 
 # контроллер - список продуктов Админка
+@AppRoute(routes=routes, url='/products-list/')
 class ProductsList:
+    @Debug(name='ProductsList')
     def __call__(self, request):
-        logger.log('Список продуктов')
+        logger.log(f'Список продуктов --> {datetime.now()}')
         try:
             category = site.find_category_by_id(int(request['request_params']['id']))
             return '200 OK', render(
@@ -80,7 +92,9 @@ class ProductsList:
             return '200 OK', 'No products have been added yet'
 
 
+@AppRoute(routes=routes, url='/suggestions/')
 class Suggestions:
+    @Debug(name='Suggestions')
     def __call__(self, request):
         return '200 OK', render(
             'suggestions.html',
@@ -88,18 +102,21 @@ class Suggestions:
             style=request.get('style', None))
 
 
+# контроллер 404
 class NotFound404:
+    @Debug(name='NotFound404')
     def __call__(self, request):
         return '404 WHAT', '404 PAGE Not Found'
 
 
 # контроллер - создать категорию
+@AppRoute(routes=routes, url='/create-category/')
 class CreateCategory:
+    @Debug(name='CreateCategory')
     def __call__(self, request):
 
         if request['method'] == 'POST':
             # метод пост
-            print(request)
             data = request['data']
 
             name = data['name']
@@ -132,9 +149,11 @@ class CreateCategory:
 
 
 # контроллер - список категорий Админка
+@AppRoute(routes=routes, url='/categories/')
 class Categories:
+    @Debug(name='Categories')
     def __call__(self, request):
-        logger.log('Список категорий')
+        logger.log(f'Список категорий --> {datetime.now()}')
         return '200 OK', render(
             'categories.html',
             objects_list=site.categories,
@@ -144,9 +163,11 @@ class Categories:
 
 
 # контроллер - создать продукт
+@AppRoute(routes=routes, url='/create-product/')
 class CreateProduct:
     category_id = -1
 
+    @Debug(name='CreateProduct')
     def __call__(self, request):
         if request['method'] == 'POST':
             # метод пост
@@ -190,15 +211,17 @@ class CreateProduct:
 
 
 # контроллер - копировать продукт
+@AppRoute(routes=routes, url='/copy-product/')
 class CopyProduct:
     def __call__(self, request):
         request_params = request['request_params']
 
         try:
             name = request_params['name']
+            name = site.decode_value(name)
             old_product = site.get_product(name)
             if old_product:
-                new_name = f'copy_{name}'
+                new_name = f'{name}_1'
                 new_product = old_product.clone()
                 new_product.name = new_name
                 site.products.append(new_product)
@@ -211,3 +234,24 @@ class CopyProduct:
             )
         except KeyError:
             return '200 OK', 'No products have been added yet'
+
+
+# контроллер - удалить продукт
+@AppRoute(routes=routes, url='/delete-product/')
+class DeleteProduct:
+    def __call__(self, request):
+        request_params = request['request_params']
+
+        try:
+            name = request_params['name']
+            name = site.decode_value(name)
+            site.products.remove(site.get_product(name))
+
+            return '200 OK', render(
+                'products_list.html',
+                objects_list=site.products,
+                today=request.get('today', None),
+                style=request.get('style', None)
+            )
+        except KeyError:
+            return '200 OK', 'No product with such a name yet'

@@ -18,14 +18,14 @@ def style(request):
 
 fronts = [date_front, style]
 
-routes = {
-    '/': Index(),
-    '/contacts/': Contacts(),
-    '/products/': Products(),
-    '/products-list/': ProductsList(),
-    '/categories/': Categories(),
-    '/suggestions/': Suggestions(),
-    '/create-product/': CreateProduct(),
-    '/create-category/': CreateCategory(),
-    '/copy-product/': CopyProduct()
-}
+# routes = {
+#     '/': Index(),
+#     '/contacts/': Contacts(),
+#     '/products/': Products(),
+#     '/products-list/': ProductsList(),
+#     '/categories/': Categories(),
+#     '/suggestions/': Suggestions(),
+#     '/create-product/': CreateProduct(),
+#     '/create-category/': CreateCategory(),
+#     '/copy-product/': CopyProduct()
+# }

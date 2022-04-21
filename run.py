@@ -1,5 +1,6 @@
 from internet_shop_framework.main import ISFramework
-from urls import routes, fronts
+from urls import fronts
+from views import routes
 from wsgiref.simple_server import make_server
 
 application = ISFramework(routes, fronts)
