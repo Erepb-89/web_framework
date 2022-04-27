@@ -1,11 +1,20 @@
 from internet_shop_framework.templator import render
+from patterns.behavioral_patterns import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
 from patterns.сreational_patterns import Engine, Logger
 from patterns.structural_patterns import AppRoute, Debug
 from datetime import datetime
 
 site = Engine()
-site.admins = ['Erepb', 'Nik']
-site.buyers = ['Andrey', 'Ilya']
+# site.create_user('admin', 'Erepb')
+# site.create_user('admin', 'Nik')
+buyer1 = site.create_user('buyer', 'Andrey')
+buyer2 = site.create_user('buyer', 'Ilya')
+buyer3 = site.create_user('buyer', 'Evgeniy')
+buyer4 = site.create_user('buyer', 'Petr')
+site.buyers.append(buyer1)
+site.buyers.append(buyer2)
+site.buyers.append(buyer3)
+site.buyers.append(buyer4)
 
 new_category1 = site.create_category('стулья', 0)
 new_category2 = site.create_category('столы', 1)
@@ -38,26 +47,26 @@ site.products.append(product9)
 logger = Logger('main')
 
 routes = {}
+email_notifier = EmailNotifier()
+sms_notifier = SmsNotifier()
 
 
+# контроллер - главная
 @AppRoute(routes=routes, url='/')
 class Index:
     @Debug(name='Index')
     def __call__(self, request):
         return '200 OK', render(
-            'index.html',
-            today=request.get('today', None),
-            style=request.get('style', None))
+            'index.html')
 
 
-@AppRoute(routes=routes, url='/contact/')
+# контроллер - контакты
+@AppRoute(routes=routes, url='/contacts/')
 class Contacts:
     @Debug(name='Contacts')
     def __call__(self, request):
         return '200 OK', render(
-            'contact.html',
-            today=request.get('today', None),
-            style=request.get('style', None))
+            'contact.html')
 
 
 # контроллер - список продуктов
@@ -67,9 +76,7 @@ class Products:
     def __call__(self, request):
         print(request['request_params'])
         return '200 OK', render(
-            'products.html',
-            today=request.get('today', None),
-            style=request.get('style', None))
+            'products.html')
 
 
 # контроллер - список продуктов Админка
@@ -84,22 +91,19 @@ class ProductsList:
                 'products_list.html',
                 objects_list=category.products,
                 name=category.name,
-                id=category.id,
-                today=request.get('today', None),
-                style=request.get('style', None)
+                id=category.id
             )
         except KeyError:
             return '200 OK', 'No products have been added yet'
 
 
+# контроллер - пожелания
 @AppRoute(routes=routes, url='/suggestions/')
 class Suggestions:
     @Debug(name='Suggestions')
     def __call__(self, request):
         return '200 OK', render(
-            'suggestions.html',
-            today=request.get('today', None),
-            style=request.get('style', None))
+            'suggestions.html')
 
 
 # контроллер 404
@@ -134,17 +138,13 @@ class CreateCategory:
 
             return '200 OK', render(
                 'categories.html',
-                objects_list=site.categories,
-                today=request.get('today', None),
-                style=request.get('style', None)
+                objects_list=site.categories
             )
         else:
             categories = site.categories
             return '200 OK', render(
                 'create_category.html',
-                categories=categories,
-                today=request.get('today', None),
-                style=request.get('style', None)
+                categories=categories
             )
 
 
@@ -156,9 +156,7 @@ class Categories:
         logger.log(f'Список категорий --> {datetime.now()}')
         return '200 OK', render(
             'categories.html',
-            objects_list=site.categories,
-            today=request.get('today', None),
-            style=request.get('style', None)
+            objects_list=site.categories
         )
 
 
@@ -184,14 +182,16 @@ class CreateProduct:
                 category = site.find_category_by_id(int(self.category_id))
 
                 product = site.create_product('sofa', name, category, price=price)
+                # Добавляем наблюдателей на продукт
+                product.observers.append(email_notifier)
+                product.observers.append(sms_notifier)
+
                 site.products.append(product)
 
             return '200 OK', render('products_list.html',
                                     objects_list=category.products,
                                     name=category.name,
-                                    id=category.id,
-                                    today=request.get('today', None),
-                                    style=request.get('style', None)
+                                    id=category.id
                                     )
 
         else:
@@ -202,9 +202,7 @@ class CreateProduct:
                 return '200 OK', render(
                     'create_product.html',
                     name=category.name,
-                    id=category.id,
-                    today=request.get('today', None),
-                    style=request.get('style', None)
+                    id=category.id
                 )
             except KeyError:
                 return '200 OK', 'No categories have been added yet'
@@ -228,9 +226,7 @@ class CopyProduct:
 
             return '200 OK', render(
                 'products_list.html',
-                objects_list=site.products,
-                today=request.get('today', None),
-                style=request.get('style', None)
+                objects_list=site.products
             )
         except KeyError:
             return '200 OK', 'No products have been added yet'
@@ -249,9 +245,62 @@ class DeleteProduct:
 
             return '200 OK', render(
                 'products_list.html',
-                objects_list=site.products,
-                today=request.get('today', None),
-                style=request.get('style', None)
+                objects_list=site.products
             )
         except KeyError:
             return '200 OK', 'No product with such a name yet'
+
+
+@AppRoute(routes=routes, url='/admins-options/')
+class AdminView(ListView):
+    template_name = 'admins_options.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['categories_count'] = site.categories_count()
+        context['buyers_count'] = site.buyers_count()
+        return context
+
+@AppRoute(routes=routes, url='/buyers/')
+class BuyerListView(ListView):
+    queryset = site.buyers
+    template_name = 'buyers.html'
+
+
+@AppRoute(routes=routes, url='/create-buyer/')
+class BuyerCreateView(CreateView):
+    template_name = 'create_buyer.html'
+
+    def create_obj(self, data: dict):
+        username = data['name']
+        username = site.decode_value(username)
+        new_obj = site.create_user('buyer', username)
+        site.buyers.append(new_obj)
+
+
+@AppRoute(routes=routes, url='/subscribe/')
+class SubscribeCreateView(CreateView):
+    """Подписка покупателя на товар"""
+    template_name = 'subscribe_buyer.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['products'] = site.products
+        context['buyers'] = site.buyers
+        return context
+
+    def create_obj(self, data: dict):
+        product_name = data['product_name']
+        product_name = site.decode_value(product_name)
+        product = site.get_product(product_name)
+        buyer_name = data['buyer_name']
+        buyer_name = site.decode_value(buyer_name)
+        buyer = site.get_buyer(buyer_name)
+        product.subscribe(buyer)
+
+
+@AppRoute(routes=routes, url='/api/')
+class ProductApi:
+    @Debug(name='ProductApi')
+    def __call__(self, request):
+        return '200 OK', BaseSerializer(site.products).save()

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}
-    Создание категории товаров | Админка
+    Создать покупателя
 {% endblock %}
 
 {% block menu %}
@@ -10,7 +10,7 @@
 {% block body %}
     <div class="details">
         <div class="half">
-            <p>Создание категории | Админка</p>
+            <p>Создание покупателя | Админка</p>
         </div>
         <div class="links clearfix">
             <ul class="links-menu">
@@ -21,14 +21,7 @@
             </ul>
         </div>
     </div>
-    <div class="container">
-        <form method="post">
-            <div class="text-footer location h4">
-                <input class="loc" name="name" placeholder="Название категории">
-                <input type="submit" class="button-order" value="Сохранить"/>
-            </div>
-        </form>
-    </div>
+    {% include "particles/_create_buyer_body.html" %}
 {% endblock %}
 
 {% block footer %}

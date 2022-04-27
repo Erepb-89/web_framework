@@ -1,12 +1,11 @@
+<div class="links clearfix">
+    <ul class="links-menu">
+        <li><a href="/create-product/?id={{id}}">Создать новый продукт</a></li>
+    </ul>
+</div>
 <div class="container">
     <br>
-    <a href="/categories/">Вернуться к категориям</a>
-    <br>
-    <br>
-    <a href="/create-product/?id={{id}}">Создать новый продукт</a>
-    <br>
-    <br>
-    <h1>Список продуктов для категории "{{name}}"</h1>
+    <h1 class="little">Список продуктов для категории "{{name}}"</h1>
     {% for product in objects_list %}
     <div class="location-1">
         <div class="text">

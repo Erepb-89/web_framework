@@ -1,10 +1,12 @@
 import copy
 import quopri
+from behavioral_patterns import FileWriter, Subject, ConsoleWriter
 
 
 # абстрактный пользователь
 class User:
-    pass
+    def __init__(self, name):
+        self.name = name
 
 
 # админ
@@ -14,7 +16,10 @@ class Admin(User):
 
 # покупатель
 class Buyer(User):
-    pass
+
+    def __init__(self, name):
+        self.products = []
+        super().__init__(name)
 
 
 # порождающий паттерн Абстрактная фабрика - фабрика пользователей
@@ -26,8 +31,8 @@ class UserFactory:
 
     # порождающий паттерн Фабричный метод
     @classmethod
-    def create(cls, type_):
-        return cls.types[type_]()
+    def create(cls, type_, name):
+        return cls.types[type_](name)
 
 
 # порождающий паттерн Прототип - Продукт
@@ -38,13 +43,24 @@ class ProductPrototype:
         return copy.deepcopy(self)
 
 
-class Product(ProductPrototype):
+class Product(ProductPrototype, Subject):
 
     def __init__(self, name, category, price):
         self.name = name
         self.category = category
         self.category.products.append(self)
         self.price = price
+        self.buyers = []
+        super().__init__()
+
+    def __getitem__(self, item):
+        return self.buyers[item]
+
+    def subscribe(self, user: Buyer):
+        self.buyers.append(user)
+        user.products.append(self)
+        print('user', user.name, 'products', user.products[0].name)
+        self.notify()
 
 
 # Диван
@@ -110,8 +126,8 @@ class Engine:
         self.categories = []
 
     @staticmethod
-    def create_user(type_):
-        return UserFactory.create(type_)
+    def create_user(type_, name):
+        return UserFactory.create(type_, name)
 
     @staticmethod
     def create_category(name, category=None):
@@ -126,7 +142,6 @@ class Engine:
 
     def find_type_by_category_id(self, id):
         for item in self.categories:
-            # print(item.name, item.id)
             if item.id == id:
                 return item
         raise Exception(f'Нет категории с id = {id}')
@@ -139,7 +154,20 @@ class Engine:
         for item in self.products:
             if item.name == name:
                 return item
-        # return None
+        return None
+
+    def get_buyer(self, name) -> Buyer:
+        for item in self.buyers:
+            if item.name == name:
+                return item
+
+    def categories_count(self):
+        result = len(self.categories)
+        return result
+
+    def buyers_count(self):
+        result = len(self.buyers)
+        return result
 
     @staticmethod
     def decode_value(val):
@@ -170,11 +198,10 @@ class SingletonByName(type):
 
 class Logger(metaclass=SingletonByName):
 
-    def __init__(self, name):
+    def __init__(self, name, writer=FileWriter('log.txt')):
         self.name = name
+        self.writer = writer
 
-    @staticmethod
-    def log(text):
-        # print('log--->', text)
-        with open('log.txt', 'a', encoding="UTF-8") as file:
-            file.write(f"{text}\n")
+    def log(self, text):
+        text = f'log---> {text}'
+        self.writer.write(text)

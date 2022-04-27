@@ -1,0 +1,25 @@
+<div class="container">
+    <div class="block">
+        <br>
+        <h1 class="little">Добавление покупателю оповещения по продукту</h1>
+        <br>
+        <p class="paragraph">Выберите один продукт и одного покупателя:</p>
+        <br>
+        <form method="post">
+            <select class="trending select" size="5" name="product_name">
+                {% for item in products %}
+                    <option value="{{item.name}}">{{item.name}}</option>
+                {% endfor %}
+            </select>
+
+            <select class="trending select" size="5" name="buyer_name">
+                {% for item in buyers %}
+                    <option value="{{item.name}}">{{item.name}}</option>
+                {% endfor %}
+            </select>
+
+            <input type="submit" class="button-order" value="Подписать"/>
+        </form>
+    </div>
+
+</div>

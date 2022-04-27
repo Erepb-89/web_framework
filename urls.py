@@ -1,22 +1,23 @@
 from datetime import date
-from views import Index, Contacts, Products, ProductsList, \
-    Suggestions, Categories, CreateProduct, CopyProduct, \
-    CreateCategory
-
 
 # front controller
+with open('templates/style.css') as file:
+    css_file = file.read()
+
+
 def date_front(request):
     request['today'] = date.today()
 
 
 def style(request):
     """css"""
-    with open('templates/style.css') as file:
-        css_file = file.read()
-        request['style'] = css_file
+    request['style'] = css_file
 
 
 fronts = [date_front, style]
+
+STYLE = css_file
+DATE = date.today()
 
 # routes = {
 #     '/': Index(),
