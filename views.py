@@ -1,54 +1,19 @@
+from architectural_system_pattern_unit_of_work import UnitOfWork
 from internet_shop_framework.templator import render
 from patterns.behavioral_patterns import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
-from patterns.сreational_patterns import Engine, Logger
+from patterns.сreational_patterns import Engine, Logger, MapperRegistry
 from patterns.structural_patterns import AppRoute, Debug
 from datetime import datetime
 
 site = Engine()
-# site.create_user('admin', 'Erepb')
-# site.create_user('admin', 'Nik')
-buyer1 = site.create_user('buyer', 'Andrey')
-buyer2 = site.create_user('buyer', 'Ilya')
-buyer3 = site.create_user('buyer', 'Evgeniy')
-buyer4 = site.create_user('buyer', 'Petr')
-site.buyers.append(buyer1)
-site.buyers.append(buyer2)
-site.buyers.append(buyer3)
-site.buyers.append(buyer4)
-
-new_category1 = site.create_category('стулья', 0)
-new_category2 = site.create_category('столы', 1)
-new_category3 = site.create_category('кресла', 2)
-new_category4 = site.create_category('диваны', 3)
-site.categories.append(new_category1)
-site.categories.append(new_category2)
-site.categories.append(new_category3)
-site.categories.append(new_category4)
-
-product1 = site.create_product('sofa', 'красивый диван', category=site.find_category_by_id(3), price=50000)
-product2 = site.create_product('sofa', 'обычный диван', category=site.find_category_by_id(3), price=25000)
-product3 = site.create_product('chair', 'красивый стул1', category=site.find_category_by_id(0), price=6000)
-product4 = site.create_product('chair', 'красивый стул2', category=site.find_category_by_id(0), price=7000)
-product5 = site.create_product('chair', 'обычный стул', category=site.find_category_by_id(0), price=4000)
-product6 = site.create_product('armchair', 'красивое кресло', category=site.find_category_by_id(2), price=15000)
-product7 = site.create_product('armchair', 'обычное кресло', category=site.find_category_by_id(2), price=10000)
-product8 = site.create_product('table', 'красивый стол', category=site.find_category_by_id(1), price=30000)
-product9 = site.create_product('table', 'обычный стол', category=site.find_category_by_id(1), price=15000)
-site.products.append(product1)
-site.products.append(product2)
-site.products.append(product3)
-site.products.append(product4)
-site.products.append(product5)
-site.products.append(product6)
-site.products.append(product7)
-site.products.append(product8)
-site.products.append(product9)
 
 logger = Logger('main')
 
 routes = {}
 email_notifier = EmailNotifier()
 sms_notifier = SmsNotifier()
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 
 # контроллер - главная
@@ -87,9 +52,10 @@ class ProductsList:
         logger.log(f'Список продуктов --> {datetime.now()}')
         try:
             category = site.find_category_by_id(int(request['request_params']['id']))
+            category_products = site.get_products_by_category(category.id)
             return '200 OK', render(
                 'products_list.html',
-                objects_list=category.products,
+                objects_list=category_products,
                 name=category.name,
                 id=category.id
             )
@@ -126,25 +92,22 @@ class CreateCategory:
             name = data['name']
             name = site.decode_value(name)
 
-            category_id = data.get('category_id')
-
-            category = None
-            if category_id:
-                category = site.find_category_by_id(int(category_id))
-
-            new_category = site.create_category(name, category)
-
+            new_category = site.create_category(name)
             site.categories.append(new_category)
+
+            # добавление в бд
+            new_category.mark_new()
+            UnitOfWork.get_current().commit()
 
             return '200 OK', render(
                 'categories.html',
-                objects_list=site.categories
+                objects_list=site.categories,
+                products_count_by_category=site.products_count_by_category
             )
         else:
-            categories = site.categories
             return '200 OK', render(
                 'create_category.html',
-                categories=categories
+                categories=site.categories
             )
 
 
@@ -156,14 +119,36 @@ class Categories:
         logger.log(f'Список категорий --> {datetime.now()}')
         return '200 OK', render(
             'categories.html',
-            objects_list=site.categories
+            objects_list=site.categories,
+            products_count_by_category=site.products_count_by_category
         )
+
+
+# контроллер - удалить категорию
+@AppRoute(routes=routes, url='/delete-category/')
+class DeleteCategory:
+    def __call__(self, request):
+        # request_params = request['request_params']
+
+        try:
+            category = site.find_category_by_id(int(request['request_params']['id']))
+            site.categories.remove(category)
+            # удаление из бд
+            category.mark_removed()
+            UnitOfWork.get_current().commit()
+
+            return '200 OK', render(
+                'categories.html',
+                objects_list=site.categories,
+                products_count_by_category=site.products_count_by_category
+            )
+        except KeyError:
+            return '200 OK', 'No category with such id is added yet'
 
 
 # контроллер - создать продукт
 @AppRoute(routes=routes, url='/create-product/')
 class CreateProduct:
-    category_id = -1
 
     @Debug(name='CreateProduct')
     def __call__(self, request):
@@ -177,19 +162,21 @@ class CreateProduct:
             price = data['price']
             price = site.decode_value(price)
 
-            category = None
-            if self.category_id != -1:
-                category = site.find_category_by_id(int(self.category_id))
+            category = site.find_category_by_id(int(self.category_id))
 
-                product = site.create_product('sofa', name, category, price=price)
-                # Добавляем наблюдателей на продукт
-                product.observers.append(email_notifier)
-                product.observers.append(sms_notifier)
+            product = site.create_product(category.name, name, category.id, price=price)
+            # Добавляем наблюдателей на продукт
+            product.observers.append(email_notifier)
+            product.observers.append(sms_notifier)
 
-                site.products.append(product)
+            site.products.append(product)
+            product.mark_new()
+            UnitOfWork.get_current().commit()
+
+            category_products = site.get_products_by_category(category.id)
 
             return '200 OK', render('products_list.html',
-                                    objects_list=category.products,
+                                    objects_list=category_products,
                                     name=category.name,
                                     id=category.id
                                     )
@@ -224,9 +211,17 @@ class CopyProduct:
                 new_product.name = new_name
                 site.products.append(new_product)
 
+                new_product.mark_new()
+                UnitOfWork.get_current().commit()
+
+            # category = site.find_category_by_id(int(request['request_params']['id']))
+            # category_products = site.get_products_by_category(category.id)
+
             return '200 OK', render(
                 'products_list.html',
-                objects_list=site.products
+                objects_list=site.products,
+                # name=category.name,
+                # id=category.id
             )
         except KeyError:
             return '200 OK', 'No products have been added yet'
@@ -241,14 +236,18 @@ class DeleteProduct:
         try:
             name = request_params['name']
             name = site.decode_value(name)
-            site.products.remove(site.get_product(name))
+            product = site.get_product(name)
+            site.products.remove(product)
+            # удаление из бд
+            product.mark_removed()
+            UnitOfWork.get_current().commit()
 
             return '200 OK', render(
                 'products_list.html',
                 objects_list=site.products
             )
         except KeyError:
-            return '200 OK', 'No product with such a name yet'
+            return '200 OK', 'No product with such a name is added yet'
 
 
 @AppRoute(routes=routes, url='/admins-options/')
@@ -261,10 +260,15 @@ class AdminView(ListView):
         context['buyers_count'] = site.buyers_count()
         return context
 
+
 @AppRoute(routes=routes, url='/buyers/')
 class BuyerListView(ListView):
     queryset = site.buyers
     template_name = 'buyers.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('buyer')
+        return mapper.all()
 
 
 @AppRoute(routes=routes, url='/create-buyer/')
@@ -276,6 +280,9 @@ class BuyerCreateView(CreateView):
         username = site.decode_value(username)
         new_obj = site.create_user('buyer', username)
         site.buyers.append(new_obj)
+        # добавление в бд
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 @AppRoute(routes=routes, url='/subscribe/')
