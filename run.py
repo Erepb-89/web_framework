@@ -1,3 +1,5 @@
+"""Run"""
+
 from internet_shop_framework.main import ISFramework
 from urls import fronts
 from views import routes

@@ -1,3 +1,5 @@
+"""Create db"""
+
 import sqlite3
 
 from views import site

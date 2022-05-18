@@ -1,3 +1,5 @@
+"""Views"""
+
 from architectural_system_pattern_unit_of_work import UnitOfWork
 from internet_shop_framework.templator import render
 from patterns.behavioral_patterns import EmailNotifier, SmsNotifier,\

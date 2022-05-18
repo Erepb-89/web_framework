@@ -1,7 +1,9 @@
+"""Urls"""
+
 from datetime import date
 
 # front controller
-with open('templates/style.css') as file:
+with open('templates/style.css', encoding='utf-8') as file:
     css_file = file.read()
 
 

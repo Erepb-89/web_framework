@@ -1,7 +1,12 @@
+"""Requests"""
+
+
 class GetMethods:
+    """Родительский класс для методов GET и POST"""
 
     @staticmethod
     def parse_input_data(data: str):
+        """Парсим данные GET-запроса, записываем в словарь"""
         result = {}
         if data:
             # делим параметры через &
@@ -15,10 +20,11 @@ class GetMethods:
 
 # get requests
 class GetRequests(GetMethods):
+    """Класс GET-запросов"""
 
     @staticmethod
     def get_request_params(environ):
-        # получаем параметры запроса
+        """Получаем параметры запроса"""
         query_string = environ['QUERY_STRING']
         # превращаем параметры в словарь
         request_params = GetRequests.parse_input_data(query_string)
@@ -27,9 +33,11 @@ class GetRequests(GetMethods):
 
 # post requests
 class PostRequests(GetMethods):
+    """Класс POST-запросов"""
 
     @staticmethod
     def get_wsgi_input_data(env) -> bytes:
+        """Получаем env"""
         # получаем длину тела
         content_length_data = env.get('CONTENT_LENGTH')
         # приводим к int
@@ -40,6 +48,7 @@ class PostRequests(GetMethods):
         return data
 
     def parse_wsgi_input_data(self, data: bytes) -> dict:
+        """Парсим данные POST-запроса, записываем в словарь"""
         result = {}
         if data:
             # декодируем данные
@@ -49,7 +58,7 @@ class PostRequests(GetMethods):
         return result
 
     def get_request_params(self, environ):
-        # получаем данные
+        """Получаем данные"""
         data = self.get_wsgi_input_data(environ)
         # превращаем данные в словарь
         data = self.parse_wsgi_input_data(data)

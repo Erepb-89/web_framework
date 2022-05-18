@@ -1,3 +1,5 @@
+"""Main"""
+
 import quopri
 
 from internet_shop_framework.requests import GetRequests, PostRequests
