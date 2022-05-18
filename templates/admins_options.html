@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}
+    Админка
+{% endblock %}
+
+{% block menu %}
+    {% include "particles/_menu.html" %}
+{% endblock %}
+
+{% block body %}
+    <div class="details">
+        <div class="half">
+            <p>Админка</p>
+        </div>
+        <div class="links clearfix">
+            <ul class="links-menu">
+                <li><a href="/admins-options/" class="active">Главная</a></li>
+                <li><a href="/categories/">Категории</a></li>
+                <li><a href="/buyers/">Покупатели</a></li>
+                <li><a href="#">Админы</a></li>
+            </ul>
+        </div>
+    </div>
+    {% include "particles/_admins_body.html" %}
+{% endblock %}
+
+{% block footer %}
+    {% include "particles/_footer.html" %}
+{% endblock %}

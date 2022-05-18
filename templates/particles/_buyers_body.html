@@ -1,0 +1,23 @@
+<div class="links clearfix">
+    <ul class="links-menu">
+        <li><a href="/create-buyer/">Создать нового покупателя</a></li>
+        <li><a href="/subscribe/">Добавить покупателю оповещение по продукту</a></li>
+    </ul>
+</div>
+
+<div class="container">
+
+    {% for item in objects_list %}
+    <div class="buyers-content">
+        <div class="text">
+            <img src="../img/icon-hover.png" alt="">
+            <p class="paragraph name">{{item.name}}</p>
+            <p>Подписки: </p>
+            {% for product in item.products %}
+                <p class="paragraph">{{product.name}} - {{product.price}}</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
