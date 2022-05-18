@@ -1,6 +1,7 @@
 from architectural_system_pattern_unit_of_work import UnitOfWork
 from internet_shop_framework.templator import render
-from patterns.behavioral_patterns import EmailNotifier, SmsNotifier, ListView, CreateView, BaseSerializer
+from patterns.behavioral_patterns import EmailNotifier, SmsNotifier,\
+    ListView, CreateView, BaseSerializer
 from patterns.сreational_patterns import Engine, Logger, MapperRegistry
 from patterns.structural_patterns import AppRoute, Debug
 from datetime import datetime
@@ -51,7 +52,8 @@ class ProductsList:
     def __call__(self, request):
         logger.log(f'Список продуктов --> {datetime.now()}')
         try:
-            category = site.find_category_by_id(int(request['request_params']['id']))
+            category = site.find_category_by_id(
+                int(request['request_params']['id']))
             category_products = site.get_products_by_category(category.id)
             return '200 OK', render(
                 'products_list.html',
@@ -131,7 +133,8 @@ class DeleteCategory:
         # request_params = request['request_params']
 
         try:
-            category = site.find_category_by_id(int(request['request_params']['id']))
+            category = site.find_category_by_id(
+                int(request['request_params']['id']))
             site.categories.remove(category)
             # удаление из бд
             category.mark_removed()
@@ -164,7 +167,8 @@ class CreateProduct:
 
             category = site.find_category_by_id(int(self.category_id))
 
-            product = site.create_product(category.name, name, category.id, price=price)
+            product = site.create_product(
+                category.name, name, category.id, price=price)
             # Добавляем наблюдателей на продукт
             product.observers.append(email_notifier)
             product.observers.append(sms_notifier)
@@ -214,7 +218,8 @@ class CopyProduct:
                 new_product.mark_new()
                 UnitOfWork.get_current().commit()
 
-            # category = site.find_category_by_id(int(request['request_params']['id']))
+            # category = site.find_category_by_id(
+            #     int(request['request_params']['id']))
             # category_products = site.get_products_by_category(category.id)
 
             return '200 OK', render(

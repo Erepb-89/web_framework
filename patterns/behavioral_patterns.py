@@ -80,7 +80,7 @@ class ListView(TemplateView):
         context_object_name = self.get_context_object_name()
         context = {
             context_object_name: queryset,
-            }
+        }
         print(context)
         return context
 
@@ -121,4 +121,3 @@ class FileWriter:
     def write(self, text):
         with open('log.txt', 'a', encoding="UTF-8") as file:
             file.write(f"{text}\n")
-

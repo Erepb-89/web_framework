@@ -36,7 +36,8 @@ class ISFramework:
             request_params = GetRequests().get_request_params(environ)
             request['request_params'] = request_params
             print(f'Нам пришли GET-параметры: {request_params}')
-        print(request)  # {'method': 'GET', 'request_params': {'id': '1', 'category': '10'}}
+        # {'method': 'GET', 'request_params': {'id': '1', 'category': '10'}}
+        print(request)
 
         # находим нужный контроллер
         # отработка паттерна page controller
@@ -47,7 +48,8 @@ class ISFramework:
         # наполняем словарь request элементами
         # этот словарь получат все контроллеры
         # отработка паттерна front controller
-        for front in self.fronts_lst:  # можно сделать активного юзера, передавать между страницами
+        for front in self.fronts_lst:  # можно сделать активного юзера,
+            # передавать между страницами
             front(request)
         # запуск контроллера с передачей объекта request
         code, body = view(request)

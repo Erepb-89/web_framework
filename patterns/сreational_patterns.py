@@ -156,11 +156,13 @@ class Engine:
         return None
 
     def get_products_by_category(self, category_id):
-        result_list = [item for item in self.products if item.category == category_id]
+        result_list = [
+            item for item in self.products if item.category == category_id]
         return result_list
 
     def products_count_by_category(self, category_id):
-        result_list = [item for item in self.products if item.category == category_id]
+        result_list = [
+            item for item in self.products if item.category == category_id]
         return len(result_list)
 
     def get_buyer(self, name) -> Buyer:
@@ -256,7 +258,8 @@ class BuyerMapper:
 
     def update(self, obj):
         statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем объект из базы
+        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем
+        # объект из базы
         self.cursor.execute(statement, (obj.name, obj.id))
         try:
             self.connection.commit()
@@ -313,7 +316,8 @@ class CategoryMapper:
 
     def update(self, obj):
         statement = f"UPDATE {self.tablename} SET name=? WHERE id=?"
-        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем объект из базы
+        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем
+        # объект из базы
         self.cursor.execute(statement, (obj.name, obj.id))
         try:
             self.connection.commit()
@@ -352,7 +356,8 @@ class ProductMapper:
         return result
 
     def find_by_id(self, id):
-        statement = f"SELECT id, name, category, price FROM {self.tablename} WHERE id=?"
+        statement = f"SELECT id, name, category, price FROM {self.tablename}" \
+                    f" WHERE id=?"
         self.cursor.execute(statement, (id,))
         result = self.cursor.fetchone()
         if result:
@@ -361,7 +366,8 @@ class ProductMapper:
             raise RecordNotFoundException(f'record with id={id} not found')
 
     def insert(self, obj):
-        statement = f"INSERT INTO {self.tablename} (name, category, price) VALUES (?, ?, ?)"
+        statement = f"INSERT INTO {self.tablename} (name, category, price)" \
+                    f" VALUES (?, ?, ?)"
         self.cursor.execute(statement, (obj.name, obj.category, obj.price))
         try:
             self.connection.commit()
@@ -369,9 +375,12 @@ class ProductMapper:
             raise DbCommitException(e.args)
 
     def update(self, obj):
-        statement = f"UPDATE {self.tablename} SET name=?, category=?, price=? WHERE id=?"
-        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем объект из базы
-        self.cursor.execute(statement, (obj.name, obj.category, obj.price, obj.id))
+        statement = f"UPDATE {self.tablename} " \
+                    f"SET name=?, category=?, price=? WHERE id=?"
+        # Где взять obj.id? Добавить в DomainModel? Или добавить когда берем
+        # объект из базы
+        self.cursor.execute(
+            statement, (obj.name, obj.category, obj.price, obj.id))
         try:
             self.connection.commit()
         except Exception as e:
